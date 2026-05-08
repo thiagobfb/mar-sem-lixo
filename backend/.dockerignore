@@ -1,0 +1,19 @@
+# Versionamento e IDE
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+*.iml
+
+# Artefatos de build (a imagem refaz com ./mvnw)
+target/
+
+# Documentação (não precisa entrar no contexto de build)
+README.md
+CLAUDE.md
+HELP.md
+
+# Próprio Dockerfile e este arquivo
+Dockerfile
+.dockerignore

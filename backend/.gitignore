@@ -1,0 +1,16 @@
+# Build do Maven
+target/
+
+# Boilerplate do Spring Initializr
+HELP.md
+
+# IDEs (não tratado no .gitignore raiz)
+*.iml
+*.iws
+*.ipr
+.idea/
+.vscode/
+.classpath
+.project
+.settings/
+.springBeans
