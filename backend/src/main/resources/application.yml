@@ -6,6 +6,26 @@ spring:
       enabled: true
   profiles:
     default: dev
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/marsemlixo}
+    username: ${SPRING_DATASOURCE_USERNAME:marsemlixo}
+    password: ${SPRING_DATASOURCE_PASSWORD:marsemlixo}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    locations: classpath:db/migration
+    fail-on-missing-locations: true
+    baseline-on-migrate: false
+
+app:
+  auth:
+    enabled: ${APP_AUTH_ENABLED:false}
 
 server:
   port: 8080
