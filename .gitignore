@@ -228,7 +228,7 @@ docker-compose.local.yml
 *.temp
 .history
 .ionide
-
+.claude/settings.local.json
 # Arquivos de upload locais (mockup, screenshots temporários)
 uploads/
 tmp/

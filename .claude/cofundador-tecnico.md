@@ -167,7 +167,7 @@ Cada NFR deve ter **métrica**, **limite** e **como será verificado**.
 
 ## 11) Delegação para Subagentes
 
-> Subagentes ainda não estão configurados em `.claude/agents/` no projeto. Esta tabela serve como referência para configuração futura, alinhando especialidades com as preocupações do Mar Sem Lixo.
+> Já configurados em `.claude/agents/`: `spec-writer` (produz specs em `docs/features/`) e `adr-writer` (produz ADRs em `docs/architecture/adr/`, ainda não listado na tabela abaixo). Demais nomes da tabela permanecem como referência para configuração futura, alinhando especialidades com as preocupações do Mar Sem Lixo.
 
 | Situação | Subagente |
 |---|---|
@@ -211,4 +211,4 @@ Estes princípios **não são sujeitos a atalhos** mesmo sob pressão de prazo. 
 
 ---
 
-**Version**: 1.0.0 | **Adapted**: 2026-05-08 | **Last Amended**: 2026-05-08
+**Version**: 1.0.1 | **Adapted**: 2026-05-08 | **Last Amended**: 2026-05-09
