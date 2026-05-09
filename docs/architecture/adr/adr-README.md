@@ -17,6 +17,8 @@ consequências.
 | [0006](0006-aws-com-cdk-em-java.md) | Cloud AWS com infraestrutura como código em CDK Java | Aceito |
 | [0007](0007-monorepo.md) | Estrutura de repositório monorepo | Aceito |
 | [0008](0008-multi-stage-dockerfile-com-layered-jar.md) | Dockerfile multi-stage com layered JAR | Aceito |
+| [0009](0009-flyway-migrations-e-datasource-postgres.md) | Estratégia de migrations Flyway e configuração do datasource | Aceito |
+| [0010](0010-hibernate-spatial-com-jts-para-geometrias.md) | Mapeamento geométrico via Hibernate Spatial com JTS | Aceito |
 
 ## Convenções
 
