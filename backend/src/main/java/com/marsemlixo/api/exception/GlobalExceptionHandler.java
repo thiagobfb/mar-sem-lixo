@@ -13,6 +13,13 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ProblemDetail handleTokenInvalido(TokenInvalidoException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        pd.setTitle("Token inválido");
+        return pd;
+    }
+
     @ExceptionHandler(AreaNotFoundException.class)
     public ProblemDetail handleNotFound(AreaNotFoundException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());

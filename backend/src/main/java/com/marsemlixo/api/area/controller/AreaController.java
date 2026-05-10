@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class AreaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('COORDENADOR')")
     @Operation(summary = "Cadastra uma nova área")
     @ApiResponse(responseCode = "201", description = "Área criada com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos ou polígono mal formado")
@@ -37,6 +39,7 @@ public class AreaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('VOLUNTARIO', 'COORDENADOR')")
     @Operation(summary = "Lista áreas com filtros opcionais")
     public List<AreaResponse> listar(
             @RequestParam(required = false) Boolean ativa,
@@ -48,6 +51,7 @@ public class AreaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VOLUNTARIO', 'COORDENADOR')")
     @Operation(summary = "Retorna o detalhe de uma área")
     @ApiResponse(responseCode = "404", description = "Área não encontrada")
     public AreaResponse buscarPorId(@PathVariable UUID id) {
@@ -55,6 +59,7 @@ public class AreaController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('COORDENADOR')")
     @Operation(summary = "Atualiza parcialmente uma área")
     @ApiResponse(responseCode = "404", description = "Área não encontrada")
     @ApiResponse(responseCode = "409", description = "Nome já existe no município")
@@ -64,6 +69,7 @@ public class AreaController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('COORDENADOR')")
     @Operation(summary = "Inativa uma área (soft-delete)")
     @ApiResponse(responseCode = "204", description = "Área inativada com sucesso")
     @ApiResponse(responseCode = "404", description = "Área não encontrada")

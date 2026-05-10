@@ -1,6 +1,12 @@
 package com.marsemlixo.api.area.controller;
 
+import com.marsemlixo.api.TestJwksConfig;
 import com.marsemlixo.api.TestcontainersConfig;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +16,22 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestcontainersConfig.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "app.google.client-id=test-client-id",
+                "app.jwt.secret=test-secret-key-must-be-at-least-32-bytes!"
+        })
+@Import({TestcontainersConfig.class, TestJwksConfig.class})
 class AreaControllerIT {
+
+    private static final String JWT_SECRET = "test-secret-key-must-be-at-least-32-bytes!";
+    private static final String BASE_URL = "/api/areas";
 
     @Autowired
     TestRestTemplate restTemplate;
@@ -28,8 +43,6 @@ class AreaControllerIT {
     void limparBanco() {
         jdbcTemplate.execute("TRUNCATE TABLE area");
     }
-
-    private static final String BASE_URL = "/api/areas";
 
     private static final String PAYLOAD_VALIDO = """
             {
@@ -60,8 +73,6 @@ class AreaControllerIT {
     @Test
     void criar_comNomeDuplicado_retorna409() {
         post(PAYLOAD_VALIDO);
-        ResponseEntity<String> response = post(PAYLOAD_VALIDO.replace("Praia do Forte", "Praia do Forte"));
-        // segunda criação com mesmo nome+municipio => 409
         ResponseEntity<String> dupe = post(PAYLOAD_VALIDO);
         assertThat(dupe.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
@@ -77,14 +88,13 @@ class AreaControllerIT {
 
     @Test
     void buscarPorId_inexistente_retorna404() {
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                BASE_URL + "/" + UUID.randomUUID(), String.class);
+        ResponseEntity<String> response = get(BASE_URL + "/" + UUID.randomUUID());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void listar_retorna200() {
-        ResponseEntity<String> response = restTemplate.getForEntity(BASE_URL, String.class);
+        ResponseEntity<String> response = get(BASE_URL);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -94,15 +104,19 @@ class AreaControllerIT {
         assertThat(criacao.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         String id = extrairId(criacao.getBody());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(criarTokenCoordenador());
         ResponseEntity<Void> delete = restTemplate.exchange(
-                BASE_URL + "/" + id, HttpMethod.DELETE, null, Void.class);
+                BASE_URL + "/" + id, HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
         assertThat(delete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void inativar_inexistente_retorna404() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(criarTokenCoordenador());
         ResponseEntity<Void> response = restTemplate.exchange(
-                BASE_URL + "/" + UUID.randomUUID(), HttpMethod.DELETE, null, Void.class);
+                BASE_URL + "/" + UUID.randomUUID(), HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
@@ -113,6 +127,7 @@ class AreaControllerIT {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(criarTokenCoordenador());
         HttpEntity<String> patch = new HttpEntity<>("""
                 { "tipo": "LAGOA" }
                 """, headers);
@@ -126,12 +141,39 @@ class AreaControllerIT {
     private ResponseEntity<String> post(String body) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(criarTokenCoordenador());
         return restTemplate.postForEntity(BASE_URL, new HttpEntity<>(body, headers), String.class);
     }
 
+    private ResponseEntity<String> get(String url) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(criarTokenCoordenador());
+        return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+    }
+
     private String extrairId(String json) {
-        // extrai "id":"<uuid>" do JSON de resposta
         int start = json.indexOf("\"id\":\"") + 6;
         return json.substring(start, start + 36);
+    }
+
+    /**
+     * Gera JWT HS256 com role=COORDENADOR diretamente, sem passar pelo endpoint /auth/google.
+     * Usa o mesmo secret configurado nas properties do teste.
+     */
+    private String criarTokenCoordenador() {
+        try {
+            JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                    .subject(UUID.randomUUID().toString())
+                    .claim("email", "coord@test.com")
+                    .claim("role", "COORDENADOR")
+                    .issueTime(new Date())
+                    .expirationTime(new Date(System.currentTimeMillis() + 3_600_000))
+                    .build();
+            SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims);
+            jwt.sign(new MACSigner(JWT_SECRET.getBytes(StandardCharsets.UTF_8)));
+            return jwt.serialize();
+        } catch (Exception e) {
+            throw new IllegalStateException("Falha ao criar token de coordenador para teste", e);
+        }
     }
 }

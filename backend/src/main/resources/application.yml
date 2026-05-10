@@ -24,8 +24,14 @@ spring:
     baseline-on-migrate: false
 
 app:
-  auth:
-    enabled: ${APP_AUTH_ENABLED:false}
+  google:
+    client-id: ${APP_GOOGLE_CLIENT_ID:test-client-id}
+    jwks-uri: ${APP_GOOGLE_JWKS_URI:https://www.googleapis.com/oauth2/v3/certs}
+  jwt:
+    secret: ${APP_JWT_SECRET:dev-secret-key-must-be-at-least-32-bytes!}
+    expiry-seconds: ${APP_JWT_EXPIRY_S:900}
+  refresh:
+    expiry-days: ${APP_REFRESH_EXPIRY_D:30}
 
 server:
   port: 8080
