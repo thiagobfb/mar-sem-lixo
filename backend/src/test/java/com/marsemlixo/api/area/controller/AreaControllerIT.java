@@ -18,7 +18,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,7 +40,7 @@ class AreaControllerIT {
 
     @BeforeEach
     void limparBanco() {
-        jdbcTemplate.execute("TRUNCATE TABLE area");
+        jdbcTemplate.execute("TRUNCATE TABLE mutirao, area");
     }
 
     private static final String PAYLOAD_VALIDO = """
@@ -88,7 +87,7 @@ class AreaControllerIT {
 
     @Test
     void buscarPorId_inexistente_retorna404() {
-        ResponseEntity<String> response = get(BASE_URL + "/" + UUID.randomUUID());
+        ResponseEntity<String> response = get(BASE_URL + "/999999");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
@@ -116,7 +115,7 @@ class AreaControllerIT {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(criarTokenCoordenador());
         ResponseEntity<Void> response = restTemplate.exchange(
-                BASE_URL + "/" + UUID.randomUUID(), HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+                BASE_URL + "/999999", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
@@ -152,18 +151,17 @@ class AreaControllerIT {
     }
 
     private String extrairId(String json) {
-        int start = json.indexOf("\"id\":\"") + 6;
-        return json.substring(start, start + 36);
+        int start = json.indexOf("\"id\":") + 5;
+        String tail = json.substring(start).trim();
+        int end = tail.indexOf(",");
+        if (end == -1) end = tail.indexOf("}");
+        return tail.substring(0, end).trim();
     }
 
-    /**
-     * Gera JWT HS256 com role=COORDENADOR diretamente, sem passar pelo endpoint /auth/google.
-     * Usa o mesmo secret configurado nas properties do teste.
-     */
     private String criarTokenCoordenador() {
         try {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                    .subject(UUID.randomUUID().toString())
+                    .subject("1")
                     .claim("email", "coord@test.com")
                     .claim("role", "COORDENADOR")
                     .issueTime(new Date())

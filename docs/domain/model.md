@@ -19,7 +19,7 @@ erDiagram
     MUTIRAO ||--o{ REGISTRO_RESIDUO : "contém"
 
     VOLUNTARIO {
-        UUID id PK
+        BIGINT id PK "IDENTITY, gerado pelo backend"
         string google_id UK
         string email
         string nome
@@ -28,7 +28,7 @@ erDiagram
     }
 
     AREA {
-        UUID id PK
+        BIGINT id PK "IDENTITY, gerado pelo backend"
         string nome
         enum tipo "PRAIA|LAGOA|MANGUE|RIO"
         geometry poligono "PostGIS POLYGON"
@@ -38,21 +38,21 @@ erDiagram
     }
 
     MUTIRAO {
-        UUID id PK
+        BIGINT id PK "IDENTITY, gerado pelo backend"
         string titulo
         date data
         time hora_inicio
         time hora_fim
-        UUID area_id FK
-        UUID organizador_id FK
+        BIGINT area_id FK
+        BIGINT organizador_id FK
         enum status "PLANEJADO|EM_ANDAMENTO|CONCLUIDO|CANCELADO"
         text observacoes
     }
 
     REGISTRO_RESIDUO {
-        UUID id PK
-        UUID mutirao_id FK
-        UUID voluntario_id FK
+        UUID id PK "gerado no cliente para idempotência offline"
+        BIGINT mutirao_id FK
+        BIGINT voluntario_id FK
         enum tipo_residuo "ENTULHO|MADEIRA|PLASTICO|METAL|ORGANICO"
         decimal metragem_perpendicular
         decimal metragem_transversal
@@ -74,7 +74,7 @@ papel, organizar mutirões.
 
 | Campo         | Tipo      | Restrições                                       |
 |---------------|-----------|--------------------------------------------------|
-| id            | UUID      | PK, gerado pelo backend                          |
+| id            | BIGINT    | PK, IDENTITY gerado pelo backend                 |
 | googleId      | String    | Único, vem do Google ID Token (claim `sub`)      |
 | email         | String    | Único, vem do Google ID Token                    |
 | nome          | String    | Não-nulo, vem do Google ID Token                 |
@@ -94,7 +94,7 @@ Região geográfica delimitada por polígono onde mutirões acontecem.
 
 | Campo     | Tipo            | Restrições                                  |
 |-----------|-----------------|---------------------------------------------|
-| id        | UUID            | PK                                          |
+| id        | BIGINT          | PK, IDENTITY gerado pelo backend            |
 | nome      | String          | Não-nulo, único por município               |
 | tipo      | Enum            | PRAIA, LAGOA, MANGUE, RIO                   |
 | poligono  | PostGIS Polygon | Não-nulo, SRID 4326 (WGS84)                 |
@@ -114,15 +114,15 @@ Região geográfica delimitada por polígono onde mutirões acontecem.
 
 Evento de coleta com tempo, lugar e participantes definidos.
 
-| Campo          | Tipo    | Restrições                                            |
-|----------------|---------|-------------------------------------------------------|
-| id             | UUID    | PK                                                    |
-| titulo         | String  | Não-nulo                                              |
-| data           | Date    | Não-nulo; futura ou de hoje na criação                |
-| horaInicio     | Time    | Não-nulo                                              |
-| horaFim        | Time    | Não-nulo, deve ser maior que `horaInicio`             |
-| areaId         | UUID FK | Referencia Area; área deve estar `ativa`              |
-| organizadorId  | UUID FK | Referencia Voluntario com role COORDENADOR            |
+| Campo          | Tipo      | Restrições                                            |
+|----------------|-----------|-------------------------------------------------------|
+| id             | BIGINT    | PK, IDENTITY gerado pelo backend                      |
+| titulo         | String    | Não-nulo                                              |
+| data           | Date      | Não-nulo; futura ou de hoje na criação                |
+| horaInicio     | Time      | Não-nulo                                              |
+| horaFim        | Time      | Não-nulo, deve ser maior que `horaInicio`             |
+| areaId         | BIGINT FK | Referencia Area; área deve estar `ativa`              |
+| organizadorId  | BIGINT FK | Referencia Voluntario com role COORDENADOR            |
 | status         | Enum    | PLANEJADO, EM_ANDAMENTO, CONCLUIDO, CANCELADO         |
 | observacoes    | Text    | Opcional                                              |
 
@@ -151,11 +151,11 @@ PLANEJADO ──► EM_ANDAMENTO ──► CONCLUIDO
 
 Unidade de dado capturada em campo durante um mutirão.
 
-| Campo                  | Tipo            | Restrições                                |
-|------------------------|-----------------|-------------------------------------------|
-| id                     | UUID            | PK; gerado no cliente para idempotência   |
-| mutiraoId              | UUID FK         | Não-nulo; mutirão deve estar EM_ANDAMENTO |
-| voluntarioId           | UUID FK         | Não-nulo                                  |
+| Campo                  | Tipo            | Restrições                                         |
+|------------------------|-----------------|-----------------------------------------------------|
+| id                     | UUID            | PK; gerado no **cliente** para idempotência offline |
+| mutiraoId              | BIGINT FK       | Não-nulo; mutirão deve estar EM_ANDAMENTO           |
+| voluntarioId           | BIGINT FK       | Não-nulo                                            |
 | tipoResiduo            | Enum            | ENTULHO, MADEIRA, PLASTICO, METAL, ORGANICO ⚠ |
 | metragemPerpendicular  | Decimal(8,2)    | > 0, em metros ⚠                          |
 | metragemTransversal    | Decimal(8,2)    | > 0, em metros ⚠                          |

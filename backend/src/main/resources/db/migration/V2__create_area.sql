@@ -1,5 +1,5 @@
 CREATE TABLE area (
-    id        UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    id        BIGINT       PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     nome      VARCHAR(255) NOT NULL,
     tipo      VARCHAR(50)  NOT NULL,
     municipio VARCHAR(255) NOT NULL,

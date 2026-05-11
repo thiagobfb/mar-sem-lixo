@@ -1,6 +1,6 @@
 CREATE TABLE refresh_token (
-    id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    voluntario_id UUID        NOT NULL REFERENCES voluntario(id),
+    id            BIGINT      PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    voluntario_id BIGINT      NOT NULL REFERENCES voluntario(id),
     token_hash    VARCHAR(64) NOT NULL,
     expira_em     TIMESTAMPTZ NOT NULL,
     criado_em     TIMESTAMPTZ NOT NULL DEFAULT NOW(),

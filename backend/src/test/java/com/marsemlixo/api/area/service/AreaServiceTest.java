@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -59,7 +58,7 @@ class AreaServiceTest {
         when(areaRepository.existsByNomeAndMunicipio(any(), any())).thenReturn(false);
         when(jdbcTemplate.queryForObject(anyString(), eq(Boolean.class), any())).thenReturn(true);
 
-        Area areaSalva = areaComId(UUID.randomUUID());
+        Area areaSalva = areaComId(1L);
         when(areaRepository.save(any())).thenReturn(areaSalva);
 
         var request = new AreaCreateRequest("Praia do Forte", AreaTipo.PRAIA, "Cabo Frio", "RJ", poligonoValido);
@@ -96,7 +95,7 @@ class AreaServiceTest {
 
     @Test
     void buscarPorId_existente_retornaAreaResponse() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         when(areaRepository.findById(id)).thenReturn(Optional.of(areaComId(id)));
 
         AreaResponse response = service.buscarPorId(id);
@@ -106,7 +105,7 @@ class AreaServiceTest {
 
     @Test
     void buscarPorId_inexistente_lancaExcecao() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         when(areaRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.buscarPorId(id))
@@ -115,7 +114,7 @@ class AreaServiceTest {
 
     @Test
     void inativar_existente_marcaComoInativa() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         Area area = areaComId(id);
         area.setAtiva(true);
         when(areaRepository.findById(id)).thenReturn(Optional.of(area));
@@ -128,7 +127,7 @@ class AreaServiceTest {
 
     @Test
     void inativar_inexistente_lancaExcecao() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         when(areaRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.inativar(id))
@@ -137,7 +136,7 @@ class AreaServiceTest {
 
     @Test
     void atualizar_comNomeDuplicado_lancaExcecao() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         Area area = areaComId(id);
         when(areaRepository.findById(id)).thenReturn(Optional.of(area));
         when(areaRepository.existsByNomeAndMunicipioAndIdNot("Outro Nome", "Cabo Frio", id))
@@ -149,9 +148,9 @@ class AreaServiceTest {
                 .isInstanceOf(NomeDuplicadoException.class);
     }
 
-    private Area areaComId(UUID id) {
+    private Area areaComId(Long id) {
         Area area = new Area();
-        var idField = setFieldById(area, id);
+        setFieldById(area, id);
         area.setNome("Praia do Forte");
         area.setTipo(AreaTipo.PRAIA);
         area.setMunicipio("Cabo Frio");
@@ -160,8 +159,7 @@ class AreaServiceTest {
         return area;
     }
 
-    // Seta o campo id via reflection (campo gerado pelo JPA)
-    private Object setFieldById(Area area, UUID id) {
+    private void setFieldById(Area area, Long id) {
         try {
             var field = Area.class.getDeclaredField("id");
             field.setAccessible(true);
@@ -169,6 +167,5 @@ class AreaServiceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 }

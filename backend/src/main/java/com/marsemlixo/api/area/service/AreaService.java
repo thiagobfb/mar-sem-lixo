@@ -6,17 +6,16 @@ import com.marsemlixo.api.area.controller.dto.AreaUpdateRequest;
 import com.marsemlixo.api.area.domain.AreaTipo;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface AreaService {
 
     AreaResponse criar(AreaCreateRequest request);
 
-    AreaResponse buscarPorId(UUID id);
+    AreaResponse buscarPorId(Long id);
 
     List<AreaResponse> listar(Boolean ativa, AreaTipo tipo, String municipio, String estado, boolean incluirPoligono);
 
-    AreaResponse atualizar(UUID id, AreaUpdateRequest request);
+    AreaResponse atualizar(Long id, AreaUpdateRequest request);
 
-    void inativar(UUID id);
+    void inativar(Long id);
 }

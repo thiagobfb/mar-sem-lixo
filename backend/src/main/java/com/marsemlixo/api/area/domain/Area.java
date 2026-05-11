@@ -3,8 +3,6 @@ package com.marsemlixo.api.area.domain;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.UUID;
-
 @Entity
 @Table(
     name = "area",
@@ -16,8 +14,8 @@ import java.util.UUID;
 public class Area {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String nome;
@@ -38,7 +36,7 @@ public class Area {
     @Column(nullable = false)
     private boolean ativa = true;
 
-    public UUID getId() { return id; }
+    public Long getId() { return id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
     public AreaTipo getTipo() { return tipo; }

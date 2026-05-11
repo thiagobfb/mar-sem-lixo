@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/areas")
@@ -54,7 +53,7 @@ public class AreaController {
     @PreAuthorize("hasAnyRole('VOLUNTARIO', 'COORDENADOR')")
     @Operation(summary = "Retorna o detalhe de uma área")
     @ApiResponse(responseCode = "404", description = "Área não encontrada")
-    public AreaResponse buscarPorId(@PathVariable UUID id) {
+    public AreaResponse buscarPorId(@PathVariable Long id) {
         return areaService.buscarPorId(id);
     }
 
@@ -63,7 +62,7 @@ public class AreaController {
     @Operation(summary = "Atualiza parcialmente uma área")
     @ApiResponse(responseCode = "404", description = "Área não encontrada")
     @ApiResponse(responseCode = "409", description = "Nome já existe no município")
-    public AreaResponse atualizar(@PathVariable UUID id, @Valid @RequestBody AreaUpdateRequest request) {
+    public AreaResponse atualizar(@PathVariable Long id, @Valid @RequestBody AreaUpdateRequest request) {
         return areaService.atualizar(id, request);
     }
 
@@ -73,7 +72,7 @@ public class AreaController {
     @Operation(summary = "Inativa uma área (soft-delete)")
     @ApiResponse(responseCode = "204", description = "Área inativada com sucesso")
     @ApiResponse(responseCode = "404", description = "Área não encontrada")
-    public void inativar(@PathVariable UUID id) {
+    public void inativar(@PathVariable Long id) {
         areaService.inativar(id);
     }
 }

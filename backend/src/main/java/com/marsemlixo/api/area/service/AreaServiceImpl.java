@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -52,7 +51,7 @@ class AreaServiceImpl implements AreaService {
 
     @Override
     @Transactional(readOnly = true)
-    public AreaResponse buscarPorId(UUID id) {
+    public AreaResponse buscarPorId(Long id) {
         return areaRepository.findById(id)
                 .map(this::toResponse)
                 .orElseThrow(() -> new AreaNotFoundException(id));
@@ -77,7 +76,7 @@ class AreaServiceImpl implements AreaService {
     }
 
     @Override
-    public AreaResponse atualizar(UUID id, AreaUpdateRequest request) {
+    public AreaResponse atualizar(Long id, AreaUpdateRequest request) {
         Area area = areaRepository.findById(id)
                 .orElseThrow(() -> new AreaNotFoundException(id));
 
@@ -103,7 +102,7 @@ class AreaServiceImpl implements AreaService {
     }
 
     @Override
-    public void inativar(UUID id) {
+    public void inativar(Long id) {
         Area area = areaRepository.findById(id)
                 .orElseThrow(() -> new AreaNotFoundException(id));
         area.setAtiva(false);

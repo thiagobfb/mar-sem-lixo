@@ -1,5 +1,5 @@
 CREATE TABLE voluntario (
-    id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    id            BIGINT       PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     google_id     VARCHAR(255) NOT NULL,
     email         VARCHAR(255) NOT NULL,
     nome          VARCHAR(255) NOT NULL,

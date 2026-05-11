@@ -68,7 +68,7 @@ class AuthServiceTest {
         when(voluntarioRepository.findByGoogleId("google-001")).thenReturn(Optional.empty());
         when(voluntarioRepository.save(any(Voluntario.class))).thenAnswer(inv -> {
             Voluntario v = inv.getArgument(0);
-            v.setId(UUID.randomUUID());
+            v.setId(1L);
             return v;
         });
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -173,7 +173,7 @@ class AuthServiceTest {
 
     private Voluntario voluntarioExistente(String googleId, String email, String nome) {
         Voluntario v = new Voluntario();
-        v.setId(UUID.randomUUID());
+        v.setId(1L);
         v.setGoogleId(googleId);
         v.setEmail(email);
         v.setNome(nome);
