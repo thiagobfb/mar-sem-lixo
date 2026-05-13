@@ -41,7 +41,7 @@ class MutiraoControllerIT {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.execute("TRUNCATE TABLE mutirao, refresh_token, voluntario, area");
+        jdbcTemplate.execute("TRUNCATE TABLE registro_residuo, mutirao, refresh_token, voluntario, area");
 
         organizadorId = jdbcTemplate.queryForObject(
                 "INSERT INTO voluntario (google_id, email, nome, role, data_cadastro) VALUES (?, ?, ?, ?, NOW()) RETURNING id",

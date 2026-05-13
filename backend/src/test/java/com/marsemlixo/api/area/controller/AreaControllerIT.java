@@ -40,7 +40,7 @@ class AreaControllerIT {
 
     @BeforeEach
     void limparBanco() {
-        jdbcTemplate.execute("TRUNCATE TABLE mutirao, area");
+        jdbcTemplate.execute("TRUNCATE TABLE registro_residuo, mutirao, area");
     }
 
     private static final String PAYLOAD_VALIDO = """
