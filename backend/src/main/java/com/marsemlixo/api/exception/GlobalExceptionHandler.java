@@ -50,9 +50,24 @@ public class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(MutiraoNaoEmAndamentoException.class)
+    public ProblemDetail handleMutiraoNaoEmAndamento(MutiraoNaoEmAndamentoException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(AreaInativaException.class)
     public ProblemDetail handleAreaInativa(AreaInativaException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    @ExceptionHandler(RegistroResiduoNotFoundException.class)
+    public ProblemDetail handleRegistroResiduoNotFound(RegistroResiduoNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(RelatorioNaoDisponivelException.class)
+    public ProblemDetail handleRelatorioNaoDisponivel(RelatorioNaoDisponivelException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
